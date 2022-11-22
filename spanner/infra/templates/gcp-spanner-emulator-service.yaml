@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+    name: "gcp-spanner-emulator"
+spec:
+  ports:
+    - name: "9010"
+      port: 9010
+      targetPort: 9010
+    - name: "9020"
+      port: 9020
+      targetPort: 9020
+  selector:
+    app: gcp-spanner-emulator
+  type: LoadBalancer
+status:
+  loadBalancer: {}

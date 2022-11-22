@@ -1,0 +1,15 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 100,
+            "driver": "Google Cloud Spanner Driver",
+            "name": "Spanner",
+            "project": "uas-project",
+            "instance": "uas-instance",
+            "database": "uas-db",
+            "connectToEmulator": true,
+            "emulatorHost": "localhost",
+            "emulatorPort": 9010
+        }
+    ]
+}

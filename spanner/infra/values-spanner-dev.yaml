@@ -1,0 +1,4 @@
+PROJECT_ID: uas-project
+SPANNER_EMULATOR_URL: http://localhost:9020/
+INSTANCE_NAME: uas-instance
+DATABASE_NAME: uas-db

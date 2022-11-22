@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gcp-spanner-emulator
+spec:
+  selector:
+    matchLabels:
+      app: gcp-spanner-emulator
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: gcp-spanner-emulator
+    spec:
+      containers:
+        - name: gcp-spanner-emulator
+          image: gcr.io/cloud-spanner-emulator/emulator:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PROJECT_ID
+              value: {{ .Values.PROJECT_ID }}
+            - name: SPANNER_EMULATOR_URL
+              value: {{ .Values.SPANNER_EMULATOR_URL }}
+            - name: INSTANCE_NAME
+              value: {{ .Values.INSTANCE_NAME }}
+            - name: DATABASE_NAME
+              value: {{ .Values.DATABASE_NAME }}
+          ports:
+            - containerPort: 9010
+              name: "spanner9010"
+            - containerPort: 9020
+              name: "spanner9020"
+          resources: {}
