@@ -1,6 +1,5 @@
 # -*- mode: Python -*-
 
-load('ext://restart_process', 'docker_build_with_restart')
 load('ext://helm_resource', 'helm_resource', 'helm_repo')
 
 compile_opt = 'GO111MODULE=on CGO_ENABLED=0 GOOS=linux GOARCH=amd64 '
@@ -19,10 +18,18 @@ helm_resource(
 
 # Create spanner db
 local_resource(
-  'spanner', 
+  'spanner-init', 
   "go run spanner/script/main.go", 
   deps=["spanner/script", "spanner/schema"],
-  dir=".",
   resource_deps=["gcp-spanner-emulator"],
   labels=["spanner"],
+)
+
+# Run pagination
+local_resource(
+  'pagination', 
+  "go run pagination/main.go", 
+  deps=["pagination"],
+  resource_deps=["spanner-init"],
+  labels=["pagination"],
 )

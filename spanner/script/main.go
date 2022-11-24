@@ -10,16 +10,13 @@ import (
 	database "cloud.google.com/go/spanner/admin/database/apiv1"
 	instance "cloud.google.com/go/spanner/admin/instance/apiv1"
 	"github.com/google/uuid"
+	"github.com/quzhi1/spanner-playground/util"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/api/option"
 	adminpb "google.golang.org/genproto/googleapis/spanner/admin/database/v1"
 	instancepb "google.golang.org/genproto/googleapis/spanner/admin/instance/v1"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
-
-var projectID = "uas-project"
-var instanceID = "uas-instance"
-var dbName = "uas-db"
 
 func main() {
 	ctx := context.Background()
@@ -82,7 +79,7 @@ func createInstance(ctx context.Context) error {
 	}
 	defer instanceAdmin.Close()
 	instance, _ := instanceAdmin.GetInstance(ctx, &instancepb.GetInstanceRequest{
-		Name:      fmt.Sprintf("projects/%s/instances/%s", projectID, instanceID),
+		Name:      fmt.Sprintf("projects/%s/instances/%s", util.ProjectID, util.InstanceID),
 		FieldMask: &fieldmaskpb.FieldMask{},
 	})
 
@@ -91,17 +88,17 @@ func createInstance(ctx context.Context) error {
 	}
 
 	op, err := instanceAdmin.CreateInstance(ctx, &instancepb.CreateInstanceRequest{
-		Parent:     fmt.Sprintf("projects/%s", projectID),
-		InstanceId: instanceID,
+		Parent:     fmt.Sprintf("projects/%s", util.ProjectID),
+		InstanceId: util.InstanceID,
 		Instance: &instancepb.Instance{
-			Config:      fmt.Sprintf("projects/%s/instanceConfigs/%s", projectID, "regional-us-central1"),
-			DisplayName: instanceID,
+			Config:      fmt.Sprintf("projects/%s/instanceConfigs/%s", util.ProjectID, "regional-us-central1"),
+			DisplayName: util.InstanceID,
 			NodeCount:   1,
 			Labels:      map[string]string{"cloud_spanner_samples": "true"},
 		},
 	})
 	if err != nil {
-		return fmt.Errorf("could not create instance %s: %v", fmt.Sprintf("projects/%s/instances/%s", projectID, instanceID), err)
+		return fmt.Errorf("could not create instance %s: %v", fmt.Sprintf("projects/%s/instances/%s", util.ProjectID, util.InstanceID), err)
 	}
 	// Wait for the instance creation to finish.
 	i, err := op.Wait(ctx)
@@ -121,28 +118,28 @@ func insertRecords(ctx context.Context) error {
 		ctx,
 		fmt.Sprintf(
 			"projects/%s/instances/%s/databases/%s",
-			projectID,
-			instanceID,
-			dbName,
+			util.ProjectID,
+			util.InstanceID,
+			util.DbName,
 		),
 	)
 	if err != nil {
 		return err
 	}
 
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 20; i++ {
 
 		m := spanner.Insert(
 			"Application",
 			[]string{
 				"PublicApplicationID",
 				"Name",
-				"IconURL",
+				"Time",
 			},
 			[]interface{}{
 				uuid.New().String(),
 				"Zhi Qu " + fmt.Sprint(i),
-				"https://www.google.com",
+				i,
 			},
 		)
 
